@@ -25,6 +25,9 @@ Route::post('/users', [UserController::class, 'store']);
 // Untuk hapus user
 Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
+Route::post('/login', [UserController::class, 'login']);
+
+
 // Update pakai PUT atau PATCH
 Route::put('/users/{id}', [UserController::class, 'update']);
 

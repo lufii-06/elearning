@@ -38,6 +38,30 @@ class UserController extends Controller
         return response()->json(['message' => 'User berhasil UPDATE!', 'data' => $user]);
     }
 
+    public function login(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email tidak ditemukan'
+            ], 401);
+        }
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Password salah'
+            ], 401);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Login berhasil',
+            'data' => $user
+        ]);
+    }
+
     // Hapus User
     public function destroy(String $id)
     {
