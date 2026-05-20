@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('speaking_materials', function (Blueprint $table) {
+        Schema::create('learning_materials', function (Blueprint $table) {
             $table->id();
-            $table->string('title'); // Kolom judul (VARCHAR)
-            $table->text('description')->nullable(); // Deskripsi panjang, boleh kosong
-            $table->string('video')->nullable(); // Kolom judul (VARCHAR)
-            $table->string('pdf')->nullable(); // Kolom judul (VARCHAR)
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->string('kategori');
+            $table->string('video');
+            $table->string('pdf')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('speaking_materials');
+        Schema::dropIfExists('learning_materials');
     }
 };

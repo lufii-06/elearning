@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SpeakingMaterial;
+use App\Models\LearningMaterial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class SpeakingController extends Controller
+class LearningMaterialController extends Controller
 {
-    private function addFileUrls(SpeakingMaterial $material): SpeakingMaterial
+    private function addFileUrls(LearningMaterial $material): LearningMaterial
     {
         $material->video_url = $material->video ? asset('storage/' . $material->video) : null;
         $material->pdf_url = $material->pdf ? asset('storage/' . $material->pdf) : null;
@@ -21,7 +21,21 @@ class SpeakingController extends Controller
      */
     public function index()
     {
-        $materials = SpeakingMaterial::all();
+        $materials = LearningMaterial::all();
+
+        foreach ($materials as $item) {
+            $this->addFileUrls($item);
+        }
+
+        return response()->json($materials);
+    }
+
+    // ======================
+    // API FILTER BERDASARKAN KATEGORI
+    // ======================
+    public function byCategory(string $kategori)
+    {
+        $materials = LearningMaterial::where('kategori', $kategori)->get();
 
         foreach ($materials as $item) {
             $this->addFileUrls($item);
@@ -37,6 +51,7 @@ class SpeakingController extends Controller
     {
         $request->validate([
             'title' => 'required',
+            'kategori' => 'required|string|max:255',
             'video' => 'required|mimes:mp4,mov,avi',
             'pdf' => 'nullable|mimes:pdf'
         ]);
@@ -52,9 +67,10 @@ class SpeakingController extends Controller
         }
 
         // =================== DATABASE ==================
-        $material = SpeakingMaterial::create([
+        $material = LearningMaterial::create([
             'title' => $request->title,
             'description' => $request->description,
+            'kategori' => $request->kategori,
             'video' => $video,
             'pdf' => $pdf,
         ]);
@@ -80,7 +96,7 @@ class SpeakingController extends Controller
     // ======================
     public function create()
     {
-        return view('speaking.create');
+        return view('learning.create');
     }
 
     // ======================
@@ -91,6 +107,7 @@ class SpeakingController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'kategori' => 'required|string|max:255',
             'video' => 'required|mimes:mp4,mov,avi',
             'pdf' => 'nullable|mimes:pdf'
         ]);
@@ -106,15 +123,16 @@ class SpeakingController extends Controller
         }
 
         // =================== DATABASE ==================
-        SpeakingMaterial::create([
+        LearningMaterial::create([
             'title' => $request->title,
             'description' => $request->description,
+            'kategori' => $request->kategori,
             'video' => $video,
             'pdf' => $pdf,
         ]);
 
         return redirect()
-            ->route('speaking.materials.index')
+            ->route('learning.materials.index')
             ->with('success', 'Materi berhasil upload');
     }
 
@@ -123,9 +141,9 @@ class SpeakingController extends Controller
     // ======================
     public function materials()
     {
-        $materials = SpeakingMaterial::latest()->get();
+        $materials = LearningMaterial::latest()->get();
 
-        return view('speaking.index', compact('materials'));
+        return view('learning.index', compact('materials'));
     }
 
     // ======================
@@ -133,9 +151,9 @@ class SpeakingController extends Controller
     // ======================
     public function editWeb(string $id)
     {
-        $material = SpeakingMaterial::findOrFail($id);
+        $material = LearningMaterial::findOrFail($id);
 
-        return view('speaking.edit', compact('material'));
+        return view('learning.edit', compact('material'));
     }
 
     // ======================
@@ -143,11 +161,12 @@ class SpeakingController extends Controller
     // ======================
     public function updateWeb(Request $request, string $id)
     {
-        $material = SpeakingMaterial::findOrFail($id);
+        $material = LearningMaterial::findOrFail($id);
 
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'kategori' => 'required|string|max:255',
             'video' => 'nullable|mimes:mp4,mov,avi',
             'pdf' => 'nullable|mimes:pdf',
         ]);
@@ -171,7 +190,7 @@ class SpeakingController extends Controller
         $material->update($data);
 
         return redirect()
-            ->route('speaking.materials.index')
+            ->route('learning.materials.index')
             ->with('success', 'Materi berhasil diupdate');
     }
 
@@ -180,7 +199,7 @@ class SpeakingController extends Controller
     // ======================
     public function destroyWeb(string $id)
     {
-        $material = SpeakingMaterial::findOrFail($id);
+        $material = LearningMaterial::findOrFail($id);
 
         if ($material->video) {
             Storage::disk('public')->delete($material->video);
@@ -193,7 +212,7 @@ class SpeakingController extends Controller
         $material->delete();
 
         return redirect()
-            ->route('speaking.materials.index')
+            ->route('learning.materials.index')
             ->with('success', 'Materi berhasil dihapus');
     }
 
@@ -202,10 +221,10 @@ class SpeakingController extends Controller
      */
     public function show(string $id)
     {
-        $material = SpeakingMaterial::find($id);
+        $material = LearningMaterial::find($id);
 
         if (!$material) {
-            return response()->json(['message' => 'Materi speaking tidak ketemu'], 404);
+            return response()->json(['message' => 'Materi learning tidak ketemu'], 404);
         }
 
         return response()->json($this->addFileUrls($material));
@@ -216,15 +235,16 @@ class SpeakingController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $material = SpeakingMaterial::find($id);
+        $material = LearningMaterial::find($id);
 
         if (!$material) {
-            return response()->json(['message' => 'Materi speaking tidak ketemu'], 404);
+            return response()->json(['message' => 'Materi learning tidak ketemu'], 404);
         }
 
         $data = $request->validate([
             'title' => ['sometimes', 'required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+            'kategori' => ['sometimes', 'required', 'string', 'max:255'],
             'video' => ['nullable', 'mimes:mp4,mov,avi'],
             'pdf' => ['nullable', 'mimes:pdf'],
         ]);
@@ -248,7 +268,7 @@ class SpeakingController extends Controller
         $material->update($data);
 
         return response()->json([
-            'message' => 'Materi speaking berhasil UPDATE!',
+            'message' => 'Materi learning berhasil UPDATE!',
             'data' => $this->addFileUrls($material),
         ]);
     }
@@ -258,10 +278,10 @@ class SpeakingController extends Controller
      */
     public function destroy(string $id)
     {
-        $material = SpeakingMaterial::find($id);
+        $material = LearningMaterial::find($id);
 
         if (!$material) {
-            return response()->json(['message' => 'Materi speaking tidak ketemu'], 404);
+            return response()->json(['message' => 'Materi learning tidak ketemu'], 404);
         }
 
         if ($material->video) {
@@ -274,6 +294,6 @@ class SpeakingController extends Controller
 
         $material->delete();
 
-        return response()->json(['message' => 'Materi speaking berhasil dihapus']);
+        return response()->json(['message' => 'Materi learning berhasil dihapus']);
     }
 }

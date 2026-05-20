@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Speaking Material</title>
+    <title>Edit Learning Material</title>
     <style>
         * {
             box-sizing: border-box;
@@ -182,6 +182,7 @@
         }
 
         input,
+        select,
         textarea {
             width: 100%;
             padding: 12px 13px;
@@ -193,6 +194,7 @@
         }
 
         input:focus,
+        select:focus,
         textarea:focus {
             border-color: var(--accent);
             outline: 3px solid rgba(37, 99, 235, 0.13);
@@ -267,12 +269,12 @@
             <div class="brand">
                 <div class="brand-mark">SP</div>
                 <div>
-                    <p class="brand-name">Speaking Studio</p>
+                    <p class="brand-name">Learning Studio</p>
                     <p class="brand-caption">Admin panel</p>
                 </div>
             </div>
 
-            <a class="nav-link" href="{{ route('speaking.materials.index') }}">Materials</a>
+            <a class="nav-link" href="{{ route('learning.materials.index') }}">Materials</a>
         </aside>
 
         <main class="content">
@@ -281,11 +283,11 @@
                     <h1>Edit Materi</h1>
                     <p class="subtitle">{{ $material->title }}</p>
                 </div>
-                <a class="button secondary" href="{{ route('speaking.materials.index') }}">Kembali</a>
+                <a class="button secondary" href="{{ route('learning.materials.index') }}">Kembali</a>
             </div>
 
             <div class="layout">
-                <form class="panel" action="{{ route('speaking.materials.update', $material->id) }}" method="POST" enctype="multipart/form-data">
+                <form class="panel" action="{{ route('learning.materials.update', $material->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -301,6 +303,20 @@
                         <label for="description">Deskripsi</label>
                         <textarea id="description" name="description">{{ old('description', $material->description) }}</textarea>
                         @error('description')
+                            <div class="error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="field">
+                        <label for="kategori">Kategori</label>
+                        <select id="kategori" name="kategori" required>
+                            <option value="">Pilih kategori</option>
+                            <option value="Vocabulary" @selected(old('kategori', $material->kategori) === 'Vocabulary')>Vocabulary</option>
+                            <option value="Grammar" @selected(old('kategori', $material->kategori) === 'Grammar')>Grammar</option>
+                            <option value="Quiz" @selected(old('kategori', $material->kategori) === 'Quiz')>Quiz</option>
+                            <option value="Daily Practice" @selected(old('kategori', $material->kategori) === 'Daily Practice')>Daily Practice</option>
+                        </select>
+                        @error('kategori')
                             <div class="error">{{ $message }}</div>
                         @enderror
                     </div>
@@ -323,7 +339,7 @@
 
                     <div class="actions">
                         <button class="button" type="submit">Update Materi</button>
-                        <a class="button secondary" href="{{ route('speaking.materials.index') }}">Batal</a>
+                        <a class="button secondary" href="{{ route('learning.materials.index') }}">Batal</a>
                     </div>
                 </form>
 
@@ -332,6 +348,11 @@
                         <h2>File Saat Ini</h2>
                     </div>
                     <div class="info-body">
+                        <div class="file-box">
+                            <p class="file-label">Kategori</p>
+                            <span>{{ $material->kategori }}</span>
+                        </div>
+
                         <div class="file-box">
                             <p class="file-label">Video</p>
                             @if ($material->video)

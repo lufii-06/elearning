@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'password' => bcrypt('password'), // Pastikan ini di-hash jika menggunakan Laravel's default hashing
         ]);
     }
 }

@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TopicController;
-use App\Http\Controllers\SpeakingController;
+use App\Http\Controllers\LearningMaterialController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -40,10 +40,28 @@ Route::put('/topics/{id}', [TopicController::class, 'update']);
 Route::patch('/topics/{id}', [TopicController::class, 'update']);
 Route::delete('/topics/{id}', [TopicController::class, 'destroy']);
 
-// CRUD Speaking Material
-Route::get('/speaking-materials', [SpeakingController::class, 'index']);
-Route::get('/speaking-materials/{id}', [SpeakingController::class, 'show']);
-Route::post('/speaking-materials', [SpeakingController::class, 'store']);
-Route::put('/speaking-materials/{id}', [SpeakingController::class, 'update']);
-Route::patch('/speaking-materials/{id}', [SpeakingController::class, 'update']);
-Route::delete('/speaking-materials/{id}', [SpeakingController::class, 'destroy']);
+// Learning Material by Category
+Route::get('/vocabulary-materials', function () {
+    return app(LearningMaterialController::class)->byCategory('Vocabulary');
+});
+
+Route::get('/grammar-materials', function () {
+    return app(LearningMaterialController::class)->byCategory('Grammar');
+});
+
+Route::get('/quiz-materials', function () {
+    return app(LearningMaterialController::class)->byCategory('Quiz');
+});
+
+Route::get('/daily-practice-materials', function () {
+    return app(LearningMaterialController::class)->byCategory('Daily Practice');
+});
+
+// CRUD Learning Material
+Route::get('/learning-materials', [LearningMaterialController::class, 'index']);
+Route::get('/learning-materials/{id}', [LearningMaterialController::class, 'show']);
+Route::post('/learning-materials', [LearningMaterialController::class, 'store']);
+Route::put('/learning-materials/{id}', [LearningMaterialController::class, 'update']);
+Route::patch('/learning-materials/{id}', [LearningMaterialController::class, 'update']);
+Route::delete('/learning-materials/{id}', [LearningMaterialController::class, 'destroy']);
+

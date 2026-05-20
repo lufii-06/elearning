@@ -1,0 +1,693 @@
+{
+  "info": {
+    "_postman_id": "6b5a1f55-4d4b-4f98-8c5b-8e2c9d68e101",
+    "name": "E-Learning API",
+    "description": "Dokumentasi Postman untuk API Laravel E-Learning. Set variable `base_url` sesuai server lokal, contoh `http://127.0.0.1:8000`.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "user_id",
+      "value": "1"
+    },
+    {
+      "key": "topic_id",
+      "value": "1"
+    },
+    {
+      "key": "learning_material_id",
+      "value": "1"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ]
+            },
+            "description": "Login user. Controller saat ini mengembalikan data user, belum mengembalikan token."
+          }
+        },
+        {
+          "name": "Get Authenticated User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/user",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "user"
+              ]
+            },
+            "description": "Endpoint bawaan Sanctum. Isi variable `token` jika autentikasi token sudah dibuat."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Student One\",\n  \"email\": \"student@example.com\",\n  \"password\": \"password\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Student Updated\",\n  \"email\": \"student.updated@example.com\",\n  \"password\": \"newpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{user_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{user_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Topics",
+      "item": [
+        {
+          "name": "List Topics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/topics",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "topics"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Show Topic",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/topics/{{topic_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topic_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Topic",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Basic Speaking\",\n  \"description\": \"Introduction topic for speaking practice\",\n  \"price\": 0,\n  \"is_free\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/topics",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "topics"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Topic",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Basic Speaking Updated\",\n  \"description\": \"Updated topic description\",\n  \"price\": 50000,\n  \"is_free\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/topics/{{topic_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topic_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Patch Topic",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Basic Speaking Patched\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/topics/{{topic_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topic_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Topic",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/topics/{{topic_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "topics",
+                "{{topic_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Learning Materials by Category",
+      "item": [
+        {
+          "name": "Vocabulary Materials",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/vocabulary-materials",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "vocabulary-materials"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Grammar Materials",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/grammar-materials",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "grammar-materials"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Quiz Materials",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/quiz-materials",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "quiz-materials"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Daily Practice Materials",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/daily-practice-materials",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "daily-practice-materials"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Learning Materials",
+      "item": [
+        {
+          "name": "List Learning Materials",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/learning-materials",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "learning-materials"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Show Learning Material",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/learning-materials/{{learning_material_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "learning-materials",
+                "{{learning_material_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Learning Material",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Learning Lesson 1",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Material for first learning lesson",
+                  "type": "text"
+                },
+                {
+                  "key": "kategori",
+                  "value": "Vocabulary",
+                  "type": "text"
+                },
+                {
+                  "key": "video",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "pdf",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/learning-materials",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "learning-materials"
+              ]
+            },
+            "description": "Gunakan body form-data. Field `kategori` dan `video` wajib. Kategori contoh: Vocabulary, Grammar, Quiz, Daily Practice. Video format mp4/mov/avi. Field `pdf` opsional."
+          }
+        },
+        {
+          "name": "Update Learning Material",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Learning Lesson Updated",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Updated learning material description",
+                  "type": "text"
+                },
+                {
+                  "key": "kategori",
+                  "value": "Grammar",
+                  "type": "text"
+                },
+                {
+                  "key": "video",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "pdf",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/learning-materials/{{learning_material_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "learning-materials",
+                "{{learning_material_id}}"
+              ]
+            },
+            "description": "Field file boleh dikosongkan jika tidak ingin mengganti video/PDF."
+          }
+        },
+        {
+          "name": "Patch Learning Material",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Learning Lesson Patched",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Patched description",
+                  "type": "text"
+                },
+                {
+                  "key": "kategori",
+                  "value": "Quiz",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/learning-materials/{{learning_material_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "learning-materials",
+                "{{learning_material_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Learning Material",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/learning-materials/{{learning_material_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "learning-materials",
+                "{{learning_material_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

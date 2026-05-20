@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Speaking Studio</title>
+    <title>Learning Materials</title>
     <style>
         * {
             box-sizing: border-box;
@@ -287,6 +287,18 @@
             color: var(--warn);
         }
 
+        .category-pill {
+            display: inline-flex;
+            min-height: 30px;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: var(--brand-soft);
+            color: var(--brand);
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
         .muted {
             color: #94a3b8;
             font-weight: 700;
@@ -333,28 +345,28 @@
             <div class="brand">
                 <div class="brand-mark">SP</div>
                 <div>
-                    <p class="brand-name">Speaking Studio</p>
+                    <p class="brand-name">Learning Studio</p>
                     <p class="brand-caption">Admin panel</p>
                 </div>
             </div>
 
             <p class="nav-label">Menu</p>
-            <a class="nav-link" href="{{ route('speaking.materials.index') }}">
+            <a class="nav-link" href="{{ route('learning.materials.index') }}">
                 <span>Materials</span>
                 <span>{{ $materials->count() }}</span>
             </a>
 
-            <div class="sidebar-note">Upload video speaking dan PDF pendukung dari satu tempat yang rapi.</div>
+            <div class="sidebar-note">Upload video learning dan PDF pendukung dari satu tempat yang rapi.</div>
         </aside>
 
         <main class="content">
             <div class="topbar">
                 <div>
-                    <h1>Speaking Materials</h1>
-                    <p class="subtitle">Kelola video pembelajaran, dokumen PDF, dan deskripsi materi speaking.</p>
+                    <h1>Learning Materials</h1>
+                    <p class="subtitle">Kelola video pembelajaran, dokumen PDF, dan deskripsi materi learning.</p>
                 </div>
 
-                <a class="button" href="{{ route('speaking.materials.create') }}">Tambah Materi</a>
+                <a class="button" href="{{ route('learning.materials.create') }}">Tambah Materi</a>
             </div>
 
             @if (session('success'))
@@ -374,13 +386,14 @@
                 </div>
 
                 @if ($materials->isEmpty())
-                    <div class="empty">Belum ada materi speaking.</div>
+                    <div class="empty">Belum ada materi learning.</div>
                 @else
                     <div class="table-wrap">
                         <table>
                             <thead>
                                 <tr>
                                     <th>Materi</th>
+                                    <th>Kategori</th>
                                     <th>Deskripsi</th>
                                     <th>Video</th>
                                     <th>PDF</th>
@@ -396,6 +409,9 @@
                                                 <span class="number">{{ $loop->iteration }}</span>
                                                 <p class="material-title">{{ $material->title }}</p>
                                             </div>
+                                        </td>
+                                        <td>
+                                            <span class="category-pill">{{ $material->kategori }}</span>
                                         </td>
                                         <td class="description">{{ $material->description ?: '-' }}</td>
                                         <td>
@@ -415,8 +431,8 @@
                                         <td>{{ $material->created_at->format('d M Y') }}</td>
                                         <td>
                                             <div class="actions">
-                                                <a class="button secondary" href="{{ route('speaking.materials.edit', $material->id) }}">Edit</a>
-                                                <form action="{{ route('speaking.materials.destroy', $material->id) }}" method="POST" onsubmit="return confirm('Hapus materi ini?')">
+                                                <a class="button secondary" href="{{ route('learning.materials.edit', $material->id) }}">Edit</a>
+                                                <form action="{{ route('learning.materials.destroy', $material->id) }}" method="POST" onsubmit="return confirm('Hapus materi ini?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button class="button danger" type="submit">Hapus</button>

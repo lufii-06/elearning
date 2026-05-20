@@ -1,15 +1,15 @@
 <?php
 
-use App\Http\Controllers\SpeakingController;
+use App\Http\Controllers\LearningMaterialController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect()->route('speaking.materials.index');
+    return redirect()->route('learning.materials.index');
 });
 
-Route::get('/speaking-materials', [SpeakingController::class, 'materials'])->name('speaking.materials.index');
-Route::get('/speaking-materials/create', [SpeakingController::class, 'create'])->name('speaking.materials.create');
-Route::post('/speaking-materials', [SpeakingController::class, 'storeWeb'])->name('speaking.materials.store');
-Route::get('/speaking-materials/{id}/edit', [SpeakingController::class, 'editWeb'])->name('speaking.materials.edit');
-Route::put('/speaking-materials/{id}', [SpeakingController::class, 'updateWeb'])->name('speaking.materials.update');
-Route::delete('/speaking-materials/{id}', [SpeakingController::class, 'destroyWeb'])->name('speaking.materials.destroy');
+Route::get('/learning-materials', [LearningMaterialController::class, 'materials'])->name('learning.materials.index');
+Route::get('/learning-materials/create', [LearningMaterialController::class, 'create'])->name('learning.materials.create');
+Route::post('/learning-materials', [LearningMaterialController::class, 'storeWeb'])->name('learning.materials.store');
+Route::get('/learning-materials/{id}/edit', [LearningMaterialController::class, 'editWeb'])->name('learning.materials.edit');
+Route::put('/learning-materials/{id}', [LearningMaterialController::class, 'updateWeb'])->name('learning.materials.update');
+Route::delete('/learning-materials/{id}', [LearningMaterialController::class, 'destroyWeb'])->name('learning.materials.destroy');

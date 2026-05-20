@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Speaking Material</title>
+    <title>Tambah Learning Material</title>
     <style>
         * {
             box-sizing: border-box;
@@ -167,6 +167,7 @@
         }
 
         input,
+        select,
         textarea {
             width: 100%;
             padding: 12px 13px;
@@ -178,6 +179,7 @@
         }
 
         input:focus,
+        select:focus,
         textarea:focus {
             border-color: var(--accent);
             outline: 3px solid rgba(37, 99, 235, 0.13);
@@ -252,25 +254,25 @@
             <div class="brand">
                 <div class="brand-mark">SP</div>
                 <div>
-                    <p class="brand-name">Speaking Studio</p>
+                    <p class="brand-name">Learning Studio</p>
                     <p class="brand-caption">Admin panel</p>
                 </div>
             </div>
 
-            <a class="nav-link" href="{{ route('speaking.materials.index') }}">Materials</a>
+            <a class="nav-link" href="{{ route('learning.materials.index') }}">Materials</a>
         </aside>
 
         <main class="content">
             <div class="topbar">
                 <div>
                     <h1>Tambah Materi</h1>
-                    <p class="subtitle">Upload video dan PDF pendukung untuk materi speaking.</p>
+                    <p class="subtitle">Upload video dan PDF pendukung untuk materi learning.</p>
                 </div>
-                <a class="button secondary" href="{{ route('speaking.materials.index') }}">Kembali</a>
+                <a class="button secondary" href="{{ route('learning.materials.index') }}">Kembali</a>
             </div>
 
             <div class="layout">
-                <form class="panel" action="{{ route('speaking.materials.store') }}" method="POST" enctype="multipart/form-data">
+                <form class="panel" action="{{ route('learning.materials.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     <div class="field">
@@ -285,6 +287,20 @@
                         <label for="description">Deskripsi</label>
                         <textarea id="description" name="description">{{ old('description') }}</textarea>
                         @error('description')
+                            <div class="error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="field">
+                        <label for="kategori">Kategori</label>
+                        <select id="kategori" name="kategori" required>
+                            <option value="">Pilih kategori</option>
+                            <option value="Vocabulary" @selected(old('kategori') === 'Vocabulary')>Vocabulary</option>
+                            <option value="Grammar" @selected(old('kategori') === 'Grammar')>Grammar</option>
+                            <option value="Quiz" @selected(old('kategori') === 'Quiz')>Quiz</option>
+                            <option value="Daily Practice" @selected(old('kategori') === 'Daily Practice')>Daily Practice</option>
+                        </select>
+                        @error('kategori')
                             <div class="error">{{ $message }}</div>
                         @enderror
                     </div>
@@ -307,7 +323,7 @@
 
                     <div class="actions">
                         <button class="button" type="submit">Simpan Materi</button>
-                        <a class="button secondary" href="{{ route('speaking.materials.index') }}">Batal</a>
+                        <a class="button secondary" href="{{ route('learning.materials.index') }}">Batal</a>
                     </div>
                 </form>
 
@@ -316,6 +332,10 @@
                         <h2>Detail Upload</h2>
                     </div>
                     <div class="info-body">
+                        <div class="info-row">
+                            <span>Kategori</span>
+                            <span>Wajib</span>
+                        </div>
                         <div class="info-row">
                             <span>Video</span>
                             <span>MP4/MOV/AVI</span>

@@ -4,11 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SpeakingMaterial extends Model
+class LearningMaterial extends Model
 {
+    protected $table = 'learning_materials';
+
     protected $fillable = [
         'title',
         'description',
+        'kategori',
         'video',
         'pdf',
     ];
