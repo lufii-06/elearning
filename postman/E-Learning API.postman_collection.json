@@ -492,6 +492,30 @@
           }
         },
         {
+          "name": "List Learning Material Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/learning-materials/categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "learning-materials",
+                "categories"
+              ]
+            },
+            "description": "Mengambil daftar kategori unik yang tersedia dari kolom `kategori` pada learning materials."
+          }
+        },
+        {
           "name": "Show Learning Material",
           "request": {
             "method": "GET",

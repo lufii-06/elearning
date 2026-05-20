@@ -44,6 +44,21 @@ class LearningMaterialController extends Controller
         return response()->json($materials);
     }
 
+    // ======================
+    // API LIST KATEGORI
+    // ======================
+    public function categories()
+    {
+        $categories = LearningMaterial::query()
+            ->whereNotNull('kategori')
+            ->where('kategori', '!=', '')
+            ->distinct()
+            ->orderBy('kategori')
+            ->pluck('kategori');
+
+        return response()->json($categories);
+    }
+
     /**
      * Store a newly created resource in storage.
      */

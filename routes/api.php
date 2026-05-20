@@ -59,9 +59,9 @@ Route::get('/daily-practice-materials', function () {
 
 // CRUD Learning Material
 Route::get('/learning-materials', [LearningMaterialController::class, 'index']);
+Route::get('/learning-materials/categories', [LearningMaterialController::class, 'categories']);
 Route::get('/learning-materials/{id}', [LearningMaterialController::class, 'show']);
 Route::post('/learning-materials', [LearningMaterialController::class, 'store']);
 Route::put('/learning-materials/{id}', [LearningMaterialController::class, 'update']);
 Route::patch('/learning-materials/{id}', [LearningMaterialController::class, 'update']);
 Route::delete('/learning-materials/{id}', [LearningMaterialController::class, 'destroy']);
-
