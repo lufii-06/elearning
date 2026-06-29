@@ -62,6 +62,15 @@ class AdminWebPackageController extends Controller
     }
 
     /**
+     * Tampilkan detail materi di dalam paket.
+     */
+    public function show(int $id): View
+    {
+        $package = Package::with('materials')->findOrFail($id);
+        return view('admin.packages.show', compact('package'));
+    }
+
+    /**
      * Form edit paket.
      */
     public function edit(int $id): View

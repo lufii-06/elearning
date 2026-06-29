@@ -44,7 +44,7 @@
                         class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors">
                     <option value="">Pilih Paket Kursus (Opsional)</option>
                     @foreach($packages as $package)
-                        <option value="{{ $package->id }}" @selected(old('package_id') == $package->id)>
+                        <option value="{{ $package->id }}" @selected(old('package_id', request('package_id')) == $package->id)>
                             {{ $package->display_name }} ({{ $package->formatted_price }})
                         </option>
                     @endforeach
