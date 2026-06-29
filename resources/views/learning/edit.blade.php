@@ -1,379 +1,149 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Learning Material</title>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+@extends('layouts.admin')
 
-        :root {
-            --ink: #111827;
-            --muted: #64748b;
-            --line: #e2e8f0;
-            --panel: #ffffff;
-            --page: #f3f6fb;
-            --accent: #2563eb;
-        }
+@section('title', 'Edit Materi')
+@section('page_title', 'Edit Materi')
+@section('page_subtitle', $material->title)
 
-        body {
-            margin: 0;
-            background: var(--page);
-            color: var(--ink);
-            font-family: Arial, sans-serif;
-        }
+@section('header_actions')
+    <a href="{{ route('learning.materials.index') }}"
+       class="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-gray-900 bg-white border border-gray-200 hover:border-gray-300 px-4 py-2 rounded-lg transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+        </svg>
+        Kembali
+    </a>
+@endsection
 
-        .app-shell {
-            display: grid;
-            grid-template-columns: 248px minmax(0, 1fr);
-            min-height: 100vh;
-        }
+@section('content')
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
-        .sidebar {
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            padding: 24px 18px;
-            background: #0f2f24;
-            color: #ffffff;
-        }
+    {{-- Form --}}
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100">
+            <h2 class="text-base font-bold text-gray-800">Informasi Materi</h2>
+            <p class="text-xs text-gray-400 mt-0.5">Kosongkan field file jika tidak ingin mengubahnya.</p>
+        </div>
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 28px;
-            padding: 8px;
-        }
+        <form action="{{ route('learning.materials.update', $material->id) }}" method="POST"
+              enctype="multipart/form-data" class="px-6 py-6 space-y-5">
+            @csrf
+            @method('PUT')
 
-        .brand-mark {
-            display: grid;
-            width: 42px;
-            height: 42px;
-            place-items: center;
-            border-radius: 8px;
-            background: #fbbf24;
-            color: #0f2f24;
-            font-weight: 900;
-        }
-
-        .brand-name {
-            margin: 0;
-            font-size: 17px;
-            font-weight: 900;
-        }
-
-        .brand-caption {
-            margin: 2px 0 0;
-            color: #bbd7cb;
-            font-size: 12px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            min-height: 44px;
-            padding: 0 12px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-            font-weight: 800;
-            text-decoration: none;
-        }
-
-        .content {
-            min-width: 0;
-            padding: 30px;
-        }
-
-        .topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 18px;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            margin: 0;
-            font-size: 34px;
-            letter-spacing: 0;
-        }
-
-        .subtitle {
-            margin: 7px 0 0;
-            color: var(--muted);
-        }
-
-        .layout {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) 320px;
-            gap: 18px;
-            align-items: start;
-        }
-
-        .panel,
-        .info-panel {
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: var(--panel);
-            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
-        }
-
-        .panel {
-            padding: 24px;
-        }
-
-        .info-panel {
-            overflow: hidden;
-        }
-
-        .info-head {
-            padding: 18px;
-            background: #0f2f24;
-            color: #ffffff;
-        }
-
-        .info-head h2 {
-            margin: 0;
-            font-size: 18px;
-        }
-
-        .info-body {
-            padding: 18px;
-        }
-
-        .file-box {
-            padding: 14px;
-            border: 1px solid #edf2f7;
-            border-radius: 8px;
-            background: #fbfdff;
-        }
-
-        .file-box + .file-box {
-            margin-top: 12px;
-        }
-
-        .file-label {
-            margin: 0 0 8px;
-            color: var(--muted);
-            font-size: 12px;
-            font-weight: 900;
-            text-transform: uppercase;
-        }
-
-        .file-link {
-            color: var(--accent);
-            font-weight: 900;
-            text-decoration: none;
-        }
-
-        .muted {
-            color: #94a3b8;
-            font-weight: 800;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 900;
-        }
-
-        input,
-        select,
-        textarea {
-            width: 100%;
-            padding: 12px 13px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            background: #fbfdff;
-            color: var(--ink);
-            font: inherit;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: var(--accent);
-            outline: 3px solid rgba(37, 99, 235, 0.13);
-        }
-
-        textarea {
-            min-height: 136px;
-            resize: vertical;
-        }
-
-        .field {
-            margin-bottom: 18px;
-        }
-
-        .error {
-            margin-top: 7px;
-            color: #dc2626;
-            font-size: 14px;
-            font-weight: 800;
-        }
-
-        .actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 40px;
-            padding: 10px 14px;
-            border: 0;
-            border-radius: 8px;
-            background: var(--accent);
-            color: #ffffff;
-            font-weight: 800;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .button.secondary {
-            background: #334155;
-        }
-
-        @media (max-width: 900px) {
-            .app-shell,
-            .layout {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                position: static;
-                height: auto;
-            }
-
-            .content {
-                padding: 22px 16px;
-            }
-
-            .topbar {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="app-shell">
-        <aside class="sidebar">
-            <div class="brand">
-                <div class="brand-mark">SP</div>
-                <div>
-                    <p class="brand-name">Learning Studio</p>
-                    <p class="brand-caption">Admin panel</p>
-                </div>
+            <div>
+                <label for="title" class="block text-sm font-semibold text-gray-700 mb-1.5">Judul <span class="text-red-500">*</span></label>
+                <input type="text" id="title" name="title" value="{{ old('title', $material->title) }}" required
+                       class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors">
+                @error('title')
+                    <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                @enderror
             </div>
 
-            <a class="nav-link" href="{{ route('learning.materials.index') }}">Materials</a>
-        </aside>
-
-        <main class="content">
-            <div class="topbar">
-                <div>
-                    <h1>Edit Materi</h1>
-                    <p class="subtitle">{{ $material->title }}</p>
-                </div>
-                <a class="button secondary" href="{{ route('learning.materials.index') }}">Kembali</a>
+            <div>
+                <label for="description" class="block text-sm font-semibold text-gray-700 mb-1.5">Deskripsi</label>
+                <textarea id="description" name="description" rows="4"
+                          class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors resize-none">{{ old('description', $material->description) }}</textarea>
+                @error('description')
+                    <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                @enderror
             </div>
 
-            <div class="layout">
-                <form class="panel" action="{{ route('learning.materials.update', $material->id) }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-
-                    <div class="field">
-                        <label for="title">Judul</label>
-                        <input id="title" type="text" name="title" value="{{ old('title', $material->title) }}" required>
-                        @error('title')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="field">
-                        <label for="description">Deskripsi</label>
-                        <textarea id="description" name="description">{{ old('description', $material->description) }}</textarea>
-                        @error('description')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="field">
-                        <label for="kategori">Kategori</label>
-                        <select id="kategori" name="kategori" required>
-                            <option value="">Pilih kategori</option>
-                            <option value="Vocabulary" @selected(old('kategori', $material->kategori) === 'Vocabulary')>Vocabulary</option>
-                            <option value="Grammar" @selected(old('kategori', $material->kategori) === 'Grammar')>Grammar</option>
-                            <option value="Quiz" @selected(old('kategori', $material->kategori) === 'Quiz')>Quiz</option>
-                            <option value="Daily Practice" @selected(old('kategori', $material->kategori) === 'Daily Practice')>Daily Practice</option>
-                        </select>
-                        @error('kategori')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="field">
-                        <label for="video">Video Baru</label>
-                        <input id="video" type="file" name="video" accept=".mp4,.mov,.avi">
-                        @error('video')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="field">
-                        <label for="pdf">PDF Baru</label>
-                        <input id="pdf" type="file" name="pdf" accept=".pdf">
-                        @error('pdf')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="actions">
-                        <button class="button" type="submit">Update Materi</button>
-                        <a class="button secondary" href="{{ route('learning.materials.index') }}">Batal</a>
-                    </div>
-                </form>
-
-                <aside class="info-panel">
-                    <div class="info-head">
-                        <h2>File Saat Ini</h2>
-                    </div>
-                    <div class="info-body">
-                        <div class="file-box">
-                            <p class="file-label">Kategori</p>
-                            <span>{{ $material->kategori }}</span>
-                        </div>
-
-                        <div class="file-box">
-                            <p class="file-label">Video</p>
-                            @if ($material->video)
-                                <a class="file-link" href="{{ asset('storage/' . $material->video) }}" target="_blank">Buka video</a>
-                            @else
-                                <span class="muted">Belum ada video</span>
-                            @endif
-                        </div>
-
-                        <div class="file-box">
-                            <p class="file-label">PDF</p>
-                            @if ($material->pdf)
-                                <a class="file-link" href="{{ asset('storage/' . $material->pdf) }}" target="_blank">Buka PDF</a>
-                            @else
-                                <span class="muted">Belum ada PDF</span>
-                            @endif
-                        </div>
-                    </div>
-                </aside>
+            <div>
+                <label for="kategori" class="block text-sm font-semibold text-gray-700 mb-1.5">Kategori <span class="text-red-500">*</span></label>
+                <select id="kategori" name="kategori" required
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors">
+                    <option value="">Pilih kategori</option>
+                    <option value="Vocabulary"     @selected(old('kategori', $material->kategori) === 'Vocabulary')>Vocabulary</option>
+                    <option value="Grammar"        @selected(old('kategori', $material->kategori) === 'Grammar')>Grammar</option>
+                    <option value="Quiz"           @selected(old('kategori', $material->kategori) === 'Quiz')>Quiz</option>
+                    <option value="Daily Practice" @selected(old('kategori', $material->kategori) === 'Daily Practice')>Daily Practice</option>
+                </select>
+                @error('kategori')
+                    <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                @enderror
             </div>
-        </main>
+
+            <div>
+                <label for="video" class="block text-sm font-semibold text-gray-700 mb-1.5">
+                    Video Baru
+                    <span class="font-normal text-gray-400 text-xs ml-1">MP4, MOV, AVI — kosongkan jika tidak diubah</span>
+                </label>
+                <input type="file" id="video" name="video" accept=".mp4,.mov,.avi"
+                       class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-gray-200 rounded-xl px-2 py-1.5">
+                @error('video')
+                    <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label for="pdf" class="block text-sm font-semibold text-gray-700 mb-1.5">
+                    PDF Baru
+                    <span class="font-normal text-gray-400 text-xs ml-1">Opsional — kosongkan jika tidak diubah</span>
+                </label>
+                <input type="file" id="pdf" name="pdf" accept=".pdf"
+                       class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 border border-gray-200 rounded-xl px-2 py-1.5">
+                @error('pdf')
+                    <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button type="submit"
+                        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Update Materi
+                </button>
+                <a href="{{ route('learning.materials.index') }}"
+                   class="inline-flex items-center text-sm font-semibold text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-5 py-2.5 rounded-xl transition-colors">
+                    Batal
+                </a>
+            </div>
+        </form>
     </div>
-</body>
-</html>
+
+    {{-- Info Panel --}}
+    <div class="bg-[#0f2f24] rounded-2xl overflow-hidden text-white">
+        <div class="px-5 py-4 border-b border-white/10">
+            <h3 class="font-bold text-sm">File Saat Ini</h3>
+        </div>
+        <div class="px-5 py-4 space-y-4">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-widest text-green-400/70 mb-1.5">Kategori</p>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-white/10 text-sm font-semibold">
+                    {{ $material->kategori }}
+                </span>
+            </div>
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-widest text-green-400/70 mb-1.5">Video</p>
+                @if($material->video)
+                    <a href="{{ asset('storage/' . $material->video) }}" target="_blank"
+                       class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-300 hover:text-blue-200 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/>
+                        </svg>
+                        Buka Video
+                    </a>
+                @else
+                    <span class="text-xs text-white/40">Belum ada video</span>
+                @endif
+            </div>
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-widest text-green-400/70 mb-1.5">PDF</p>
+                @if($material->pdf)
+                    <a href="{{ asset('storage/' . $material->pdf) }}" target="_blank"
+                       class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-300 hover:text-amber-200 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                        </svg>
+                        Buka PDF
+                    </a>
+                @else
+                    <span class="text-xs text-white/40">Belum ada PDF</span>
+                @endif
+            </div>
+        </div>
+    </div>
+
+</div>
+@endsection

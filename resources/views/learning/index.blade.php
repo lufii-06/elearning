@@ -1,452 +1,156 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learning Materials</title>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+@extends('layouts.admin')
 
-        :root {
-            --ink: #111827;
-            --muted: #64748b;
-            --line: #e2e8f0;
-            --panel: #ffffff;
-            --page: #f3f6fb;
-            --brand: #14532d;
-            --brand-soft: #dcfce7;
-            --accent: #2563eb;
-            --warn: #b45309;
-            --danger: #dc2626;
-        }
+@section('title', 'Learning Materials')
+@section('page_title', 'Learning Materials')
+@section('page_subtitle', 'Kelola video pembelajaran, dokumen PDF, dan materi learning.')
 
-        body {
-            margin: 0;
-            background: var(--page);
-            color: var(--ink);
-            font-family: Arial, sans-serif;
-        }
+@section('header_actions')
+    <a href="{{ route('learning.materials.create') }}"
+       class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        Tambah Materi
+    </a>
+@endsection
 
-        .app-shell {
-            display: grid;
-            grid-template-columns: 248px minmax(0, 1fr);
-            min-height: 100vh;
-        }
+@section('content')
 
-        .sidebar {
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            padding: 24px 18px;
-            background: #0f2f24;
-            color: #ffffff;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 28px;
-            padding: 8px;
-        }
-
-        .brand-mark {
-            display: grid;
-            width: 42px;
-            height: 42px;
-            place-items: center;
-            border-radius: 8px;
-            background: #fbbf24;
-            color: #0f2f24;
-            font-weight: 900;
-        }
-
-        .brand-name {
-            margin: 0;
-            font-size: 17px;
-            font-weight: 900;
-        }
-
-        .brand-caption {
-            margin: 2px 0 0;
-            color: #bbd7cb;
-            font-size: 12px;
-        }
-
-        .nav-label {
-            margin: 0 8px 10px;
-            color: #92b8a8;
-            font-size: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            min-height: 44px;
-            padding: 0 12px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-            font-weight: 800;
-            text-decoration: none;
-        }
-
-        .sidebar-note {
-            margin-top: 24px;
-            padding: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            border-radius: 8px;
-            color: #d9eee5;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .content {
-            min-width: 0;
-            padding: 30px;
-        }
-
-        .topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 18px;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            margin: 0;
-            font-size: 34px;
-            letter-spacing: 0;
-        }
-
-        .subtitle {
-            margin: 7px 0 0;
-            color: var(--muted);
-            line-height: 1.5;
-        }
-
-        .button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 40px;
-            padding: 10px 14px;
-            border: 0;
-            border-radius: 8px;
-            background: var(--accent);
-            color: #ffffff;
-            font-weight: 800;
-            text-decoration: none;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .button.secondary {
-            background: #334155;
-        }
-
-        .button.danger {
-            background: var(--danger);
-        }
-
-        .alert {
-            margin-bottom: 16px;
-            padding: 13px 14px;
-            border: 1px solid #bbf7d0;
-            border-left: 5px solid #16a34a;
-            border-radius: 8px;
-            background: #f0fdf4;
-            color: #166534;
-            font-weight: 800;
-        }
-
-        .summary-strip {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        .chip {
-            display: inline-flex;
-            align-items: center;
-            min-height: 34px;
-            padding: 7px 11px;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: #ffffff;
-            color: #475569;
-            font-weight: 800;
-        }
-
-        .table-card {
-            overflow: hidden;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: var(--panel);
-            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
-        }
-
-        .table-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 14px;
-            padding: 18px;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .table-title {
-            margin: 0;
-            font-size: 18px;
-        }
-
-        .table-count {
-            color: var(--muted);
-            font-weight: 800;
-        }
-
-        .table-wrap {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            min-width: 900px;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            padding: 15px 18px;
-            border-bottom: 1px solid #edf2f7;
-            text-align: left;
-            vertical-align: middle;
-        }
-
-        th {
-            background: #f8fafc;
-            color: #475569;
-            font-size: 12px;
-            font-weight: 900;
-            text-transform: uppercase;
-        }
-
-        tr:last-child td {
-            border-bottom: 0;
-        }
-
-        .material {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .number {
-            display: grid;
-            width: 34px;
-            height: 34px;
-            place-items: center;
-            border-radius: 8px;
-            background: var(--brand-soft);
-            color: var(--brand);
-            font-weight: 900;
-        }
-
-        .material-title {
-            margin: 0;
-            font-weight: 900;
-        }
-
-        .description {
-            max-width: 360px;
-            color: #526173;
-            line-height: 1.5;
-        }
-
-        .file-link {
-            display: inline-flex;
-            min-height: 34px;
-            align-items: center;
-            padding: 7px 11px;
-            border-radius: 8px;
-            background: #eff6ff;
-            color: #1d4ed8;
-            font-weight: 900;
-            text-decoration: none;
-        }
-
-        .file-link.pdf {
-            background: #fffbeb;
-            color: var(--warn);
-        }
-
-        .category-pill {
-            display: inline-flex;
-            min-height: 30px;
-            align-items: center;
-            padding: 6px 10px;
-            border-radius: 999px;
-            background: var(--brand-soft);
-            color: var(--brand);
-            font-weight: 900;
-            white-space: nowrap;
-        }
-
-        .muted {
-            color: #94a3b8;
-            font-weight: 700;
-        }
-
-        .actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .empty {
-            padding: 44px 18px;
-            text-align: center;
-            color: var(--muted);
-            font-weight: 800;
-        }
-
-        @media (max-width: 860px) {
-            .app-shell {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                position: static;
-                height: auto;
-            }
-
-            .content {
-                padding: 22px 16px;
-            }
-
-            .topbar,
-            .table-head {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="app-shell">
-        <aside class="sidebar">
-            <div class="brand">
-                <div class="brand-mark">SP</div>
-                <div>
-                    <p class="brand-name">Learning Studio</p>
-                    <p class="brand-caption">Admin panel</p>
-                </div>
-            </div>
-
-            <p class="nav-label">Menu</p>
-            <a class="nav-link" href="{{ route('learning.materials.index') }}">
-                <span>Materials</span>
-                <span>{{ $materials->count() }}</span>
-            </a>
-
-            <div class="sidebar-note">Upload video learning dan PDF pendukung dari satu tempat yang rapi.</div>
-        </aside>
-
-        <main class="content">
-            <div class="topbar">
-                <div>
-                    <h1>Learning Materials</h1>
-                    <p class="subtitle">Kelola video pembelajaran, dokumen PDF, dan deskripsi materi learning.</p>
-                </div>
-
-                <a class="button" href="{{ route('learning.materials.create') }}">Tambah Materi</a>
-            </div>
-
-            @if (session('success'))
-                <div class="alert">{{ session('success') }}</div>
-            @endif
-
-            <div class="summary-strip">
-                <span class="chip">{{ $materials->count() }} materi</span>
-                <span class="chip">{{ $materials->whereNotNull('video')->count() }} video</span>
-                <span class="chip">{{ $materials->whereNotNull('pdf')->count() }} PDF</span>
-            </div>
-
-            <section class="table-card">
-                <div class="table-head">
-                    <h2 class="table-title">Daftar Materi</h2>
-                    <span class="table-count">Terbaru di atas</span>
-                </div>
-
-                @if ($materials->isEmpty())
-                    <div class="empty">Belum ada materi learning.</div>
-                @else
-                    <div class="table-wrap">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Materi</th>
-                                    <th>Kategori</th>
-                                    <th>Deskripsi</th>
-                                    <th>Video</th>
-                                    <th>PDF</th>
-                                    <th>Dibuat</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($materials as $material)
-                                    <tr>
-                                        <td>
-                                            <div class="material">
-                                                <span class="number">{{ $loop->iteration }}</span>
-                                                <p class="material-title">{{ $material->title }}</p>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="category-pill">{{ $material->kategori }}</span>
-                                        </td>
-                                        <td class="description">{{ $material->description ?: '-' }}</td>
-                                        <td>
-                                            @if ($material->video)
-                                                <a class="file-link" href="{{ asset('storage/' . $material->video) }}" target="_blank">Video</a>
-                                            @else
-                                                <span class="muted">Kosong</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if ($material->pdf)
-                                                <a class="file-link pdf" href="{{ asset('storage/' . $material->pdf) }}" target="_blank">PDF</a>
-                                            @else
-                                                <span class="muted">Kosong</span>
-                                            @endif
-                                        </td>
-                                        <td>{{ $material->created_at->format('d M Y') }}</td>
-                                        <td>
-                                            <div class="actions">
-                                                <a class="button secondary" href="{{ route('learning.materials.edit', $material->id) }}">Edit</a>
-                                                <form action="{{ route('learning.materials.destroy', $material->id) }}" method="POST" onsubmit="return confirm('Hapus materi ini?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="button danger" type="submit">Hapus</button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
-            </section>
-        </main>
+@if(session('success'))
+    <div class="mb-6 flex items-start gap-3 bg-green-50 border border-green-200 text-green-800 rounded-xl px-4 py-3 text-sm font-medium">
+        <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        {{ session('success') }}
     </div>
-</body>
-</html>
+@endif
+
+{{-- Stats strip --}}
+<div class="flex gap-3 mb-6 flex-wrap">
+    <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm">
+        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+        {{ $materials->count() }} materi
+    </div>
+    <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm">
+        <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"/>
+        </svg>
+        {{ $materials->whereNotNull('video')->count() }} video
+    </div>
+    <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm">
+        <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+        </svg>
+        {{ $materials->whereNotNull('pdf')->count() }} PDF
+    </div>
+</div>
+
+{{-- Table --}}
+<div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div>
+            <h2 class="text-base font-bold text-gray-800">Daftar Materi</h2>
+            <p class="text-xs text-gray-400 mt-0.5">Terbaru di atas</p>
+        </div>
+    </div>
+
+    @if($materials->isEmpty())
+        <div class="flex flex-col items-center justify-center py-16 text-center">
+            <div class="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+            </div>
+            <p class="text-sm font-semibold text-gray-700">Belum ada materi learning.</p>
+            <p class="text-xs text-gray-400 mt-1">Klik "Tambah Materi" untuk mulai menambahkan.</p>
+        </div>
+    @else
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-gray-100 bg-gray-50/60">
+                        <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-6 py-3">Materi</th>
+                        <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-4 py-3">Kategori</th>
+                        <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-4 py-3">Deskripsi</th>
+                        <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-4 py-3">Video</th>
+                        <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-4 py-3">PDF</th>
+                        <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-4 py-3">Dibuat</th>
+                        <th class="text-right text-xs font-bold text-gray-500 uppercase tracking-wider px-6 py-3">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @foreach($materials as $material)
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-lg bg-green-50 text-green-700 text-xs font-black flex items-center justify-center flex-shrink-0 border border-green-100">
+                                    {{ $loop->iteration }}
+                                </span>
+                                <p class="font-semibold text-gray-900">{{ $material->title }}</p>
+                            </div>
+                        </td>
+                        <td class="px-4 py-4">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-green-50 text-green-700 text-xs font-semibold">
+                                {{ $material->kategori }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-4 text-gray-500 max-w-xs truncate">
+                            {{ $material->description ?: '—' }}
+                        </td>
+                        <td class="px-4 py-4">
+                            @if($material->video)
+                                <a href="{{ asset('storage/' . $material->video) }}" target="_blank"
+                                   class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 rounded-lg transition-colors">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/>
+                                    </svg>
+                                    Video
+                                </a>
+                            @else
+                                <span class="text-gray-300 text-xs font-semibold">Kosong</span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-4">
+                            @if($material->pdf)
+                                <a href="{{ asset('storage/' . $material->pdf) }}" target="_blank"
+                                   class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-600 bg-amber-50 hover:bg-amber-100 px-2.5 py-1.5 rounded-lg transition-colors">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                                    </svg>
+                                    PDF
+                                </a>
+                            @else
+                                <span class="text-gray-300 text-xs font-semibold">Kosong</span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-4 text-gray-400 text-xs">
+                            {{ $material->created_at->format('d M Y') }}
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center justify-end gap-2">
+                                <a href="{{ route('learning.materials.edit', $material->id) }}"
+                                   class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors">
+                                    Edit
+                                </a>
+                                <form action="{{ route('learning.materials.destroy', $material->id) }}"
+                                      method="POST" onsubmit="return confirm('Hapus materi ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="inline-flex items-center gap-1.5 text-xs font-semibold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors">
+                                        Hapus
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
+</div>
+
+@endsection
