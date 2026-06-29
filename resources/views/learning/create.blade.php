@@ -42,8 +42,8 @@
                         <select id="package_id" name="package_id"
                                 class="w-full px-3.5 py-2.5 rounded-xl border border-yellow-100 bg-[#fdfcf9] text-sm outline-none focus:border-yellow-500 focus:bg-white focus:ring-2 focus:ring-yellow-100 transition-colors">
                             <option value="">Pilih Paket Kursus (Opsional)</option>
-                            @foreach($packages as $package)
-                                <option value="{{ $package->id }}" @selected(old('package_id') == $package->id)>
+                            @foreach($packages ?? [] as $package)
+                                <option value="{{ $package->id }}" @selected(old('package_id', request('package_id')) == $package->id)>
                                     {{ $package->display_name }} ({{ $package->formatted_price }})
                                 </option>
                             @endforeach
