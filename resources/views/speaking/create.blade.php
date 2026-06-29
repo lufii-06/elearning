@@ -1,464 +1,100 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Speaking Material</title>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+@extends('layouts.admin')
 
-        :root {
-            --bg: #f4f7fb;
-            --panel: #ffffff;
-            --ink: #17211f;
-            --muted: #667085;
-            --line: #dfe7e3;
-            --sidebar: #102b25;
-            --sidebar-2: #183b33;
-            --brand: #2f6055;
-            --accent: #2563eb;
-            --danger: #c24135;
-            --gold: #f4b942;
-        }
+@section('title', 'Tambah Speaking Material')
+@section('page_title', 'Tambah Speaking Material')
+@section('page_subtitle', 'Upload video pembelajaran berbicara dan dokumen PDF pendukung.')
 
-        body {
-            margin: 0;
-            background: var(--bg);
-            color: var(--ink);
-            font-family: Inter, Arial, sans-serif;
-        }
+@section('header_actions')
+    <a href="{{ route('learning.materials.index') }}"
+       class="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-gray-900 bg-white border border-yellow-100 hover:border-yellow-200 px-4 py-2 rounded-xl shadow-sm transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+        </svg>
+        Kembali
+    </a>
+@endsection
 
-        .app {
-            display: grid;
-            grid-template-columns: 280px minmax(0, 1fr);
-            min-height: 100vh;
-        }
+@section('content')
+<div class="max-w-4xl mx-auto">
+    <form action="{{ route('speaking.materials.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        @csrf
 
-        .sidebar {
-            position: sticky;
-            top: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            padding: 22px 16px;
-            background: linear-gradient(180deg, var(--sidebar), #0b211c);
-            color: #ffffff;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 8px 22px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-        }
-
-        .brand-mark {
-            display: grid;
-            width: 44px;
-            height: 44px;
-            place-items: center;
-            border-radius: 8px;
-            background: var(--gold);
-            color: #102b25;
-            font-weight: 900;
-        }
-
-        .brand-title {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 900;
-        }
-
-        .brand-caption {
-            margin: 3px 0 0;
-            color: #b8d1ca;
-            font-size: 12px;
-        }
-
-        .admin-card {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 18px 0;
-            padding: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.07);
-        }
-
-        .avatar {
-            display: grid;
-            width: 38px;
-            height: 38px;
-            flex: 0 0 auto;
-            place-items: center;
-            border-radius: 8px;
-            background: #e8fff5;
-            color: var(--sidebar);
-            font-weight: 900;
-        }
-
-        .admin-name {
-            margin: 0;
-            font-size: 14px;
-            font-weight: 900;
-        }
-
-        .admin-role {
-            margin: 3px 0 0;
-            color: #b8d1ca;
-            font-size: 12px;
-        }
-
-        .nav-label {
-            margin: 18px 10px 9px;
-            color: #8fb3a8;
-            font-size: 11px;
-            font-weight: 900;
-            letter-spacing: 0;
-            text-transform: uppercase;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-height: 46px;
-            margin-bottom: 6px;
-            padding: 0 12px;
-            border-radius: 8px;
-            color: #d9eee5;
-            font-weight: 800;
-            text-decoration: none;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            background: var(--sidebar-2);
-            color: #ffffff;
-        }
-
-        .nav-icon {
-            display: grid;
-            width: 28px;
-            height: 28px;
-            place-items: center;
-            border-radius: 7px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-            font-size: 11px;
-            font-weight: 900;
-        }
-
-        .sidebar-footer {
-            margin-top: auto;
-            padding: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.07);
-        }
-
-        .status-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            color: #d9eee5;
-            font-size: 13px;
-            font-weight: 800;
-        }
-
-        .status-dot {
-            width: 9px;
-            height: 9px;
-            border-radius: 999px;
-            background: #22c55e;
-        }
-
-        .main {
-            min-width: 0;
-            padding: 30px;
-        }
-
-        .topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            margin-bottom: 22px;
-        }
-
-        h1 {
-            margin: 0;
-            font-size: clamp(28px, 4vw, 40px);
-            letter-spacing: 0;
-        }
-
-        .subtitle {
-            margin: 8px 0 0;
-            color: var(--muted);
-        }
-
-        .layout {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) 320px;
-            gap: 18px;
-            align-items: start;
-        }
-
-        .panel,
-        .side-panel {
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: var(--panel);
-            box-shadow: 0 18px 40px rgba(31, 41, 55, 0.08);
-        }
-
-        .panel {
-            padding: 24px;
-        }
-
-        .side-panel {
-            overflow: hidden;
-        }
-
-        .side-head {
-            padding: 18px;
-            background: var(--brand);
-            color: #ffffff;
-        }
-
-        .side-head h2 {
-            margin: 0;
-            font-size: 18px;
-        }
-
-        .side-body {
-            padding: 18px;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 12px 0;
-            border-bottom: 1px solid #edf1ef;
-            color: #566963;
-            font-weight: 800;
-        }
-
-        .summary-row:last-child {
-            border-bottom: 0;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #263b36;
-            font-weight: 900;
-        }
-
-        input,
-        textarea {
-            width: 100%;
-            padding: 12px 13px;
-            border: 1px solid #cbd8d3;
-            border-radius: 8px;
-            background: #fbfdfc;
-            color: #17211f;
-            font: inherit;
-        }
-
-        input:focus,
-        textarea:focus {
-            border-color: var(--brand);
-            outline: 3px solid rgba(47, 96, 85, 0.14);
-        }
-
-        textarea {
-            min-height: 140px;
-            resize: vertical;
-        }
-
-        .field {
-            margin-bottom: 18px;
-        }
-
-        .error {
-            margin-top: 7px;
-            color: var(--danger);
-            font-size: 14px;
-            font-weight: 800;
-        }
-
-        .actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 6px;
-        }
-
-        .button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 42px;
-            padding: 10px 16px;
-            border: 0;
-            border-radius: 8px;
-            background: var(--accent);
-            color: #ffffff;
-            font-weight: 900;
-            text-decoration: none;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .button.secondary {
-            background: var(--brand);
-        }
-
-        @media (max-width: 920px) {
-            .app,
-            .layout {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                position: static;
-                height: auto;
-            }
-
-            .main {
-                padding: 22px 16px;
-            }
-
-            .topbar {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="app">
-        <aside class="sidebar">
-            <div class="brand">
-                <div class="brand-mark">EL</div>
+        {{-- Section 1: Informasi Utama --}}
+        <div class="bg-white rounded-2xl border border-yellow-100 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-yellow-50 bg-[#faf9f6]">
+                <h2 class="text-sm font-black uppercase tracking-wider text-gray-800">Informasi Utama</h2>
+            </div>
+            <div class="p-6 space-y-5">
+                {{-- Judul --}}
                 <div>
-                    <p class="brand-title">E-Learning</p>
-                    <p class="brand-caption">Admin Console</p>
+                    <label for="title" class="block text-sm font-bold text-gray-700 mb-1.5">Judul <span class="text-red-500">*</span></label>
+                    <input type="text" id="title" name="title" value="{{ old('title') }}" required placeholder="Masukkan judul materi speaking..."
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-yellow-100 bg-[#fdfcf9] text-sm outline-none focus:border-yellow-500 focus:bg-white focus:ring-2 focus:ring-yellow-100 transition-colors">
+                    @error('title')
+                        <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
-            </div>
 
-            <div class="admin-card">
-                <div class="avatar">AD</div>
+                {{-- Deskripsi --}}
                 <div>
-                    <p class="admin-name">Admin Panel</p>
-                    <p class="admin-role">Content Manager</p>
+                    <label for="description" class="block text-sm font-bold text-gray-700 mb-1.5">Deskripsi</label>
+                    <textarea id="description" name="description" rows="3" placeholder="Tambahkan deskripsi ringkas..."
+                              class="w-full px-3.5 py-2.5 rounded-xl border border-yellow-100 bg-[#fdfcf9] text-sm outline-none focus:border-yellow-500 focus:bg-white focus:ring-2 focus:ring-yellow-100 transition-colors resize-none">{{ old('description') }}</textarea>
+                    @error('description')
+                        <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
+        </div>
 
-            <nav>
-                <p class="nav-label">Main Menu</p>
-                <a class="nav-link" href="{{ route('speaking.materials.index') }}">
-                    <span class="nav-icon">DB</span>
-                    <span>Dashboard</span>
-                </a>
-                <a class="nav-link" href="{{ route('speaking.materials.index') }}">
-                    <span class="nav-icon">SM</span>
-                    <span>Speaking Materials</span>
-                </a>
-                <a class="nav-link active" href="{{ route('speaking.materials.create') }}">
-                    <span class="nav-icon">UP</span>
-                    <span>Upload Materi</span>
-                </a>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="status-row">
-                    <span>Storage public</span>
-                    <span class="status-dot"></span>
-                </div>
+        {{-- Section 2: Berkas & Media --}}
+        <div class="bg-white rounded-2xl border border-yellow-100 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-yellow-50 bg-[#faf9f6]">
+                <h2 class="text-sm font-black uppercase tracking-wider text-gray-800">Berkas & Media Pembelajaran</h2>
             </div>
-        </aside>
-
-        <main class="main">
-            <div class="topbar">
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+                {{-- Video --}}
                 <div>
-                    <h1>Tambah Materi</h1>
-                    <p class="subtitle">Buat materi speaking baru untuk aplikasi e-learning.</p>
+                    <label for="video" class="block text-sm font-bold text-gray-700 mb-1.5">
+                        File Video <span class="text-red-500">*</span>
+                        <span class="font-normal text-gray-400 text-xs ml-1">(MP4, MOV, AVI)</span>
+                    </label>
+                    <input type="file" id="video" name="video" accept=".mp4,.mov,.avi" required
+                           class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-yellow-50 file:text-yellow-950 hover:file:bg-yellow-100 border border-yellow-100 rounded-xl px-2 py-1.5">
+                    @error('video')
+                        <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <a class="button secondary" href="{{ route('speaking.materials.index') }}">Kembali</a>
+                {{-- PDF --}}
+                <div>
+                    <label for="pdf" class="block text-sm font-bold text-gray-700 mb-1.5">
+                        Dokumen PDF Pendukung
+                        <span class="font-normal text-gray-400 text-xs ml-1">(Opsional)</span>
+                    </label>
+                    <input type="file" id="pdf" name="pdf" accept=".pdf"
+                           class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-yellow-50 file:text-yellow-950 hover:file:bg-yellow-100 border border-yellow-100 rounded-xl px-2 py-1.5">
+                    @error('pdf')
+                        <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
+        </div>
 
-            <div class="layout">
-                <form class="panel" action="{{ route('speaking.materials.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-
-                    <div class="field">
-                        <label for="title">Judul</label>
-                        <input id="title" type="text" name="title" value="{{ old('title') }}" required>
-                        @error('title')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="field">
-                        <label for="description">Deskripsi</label>
-                        <textarea id="description" name="description">{{ old('description') }}</textarea>
-                        @error('description')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="field">
-                        <label for="video">Video</label>
-                        <input id="video" type="file" name="video" accept=".mp4,.mov,.avi" required>
-                        @error('video')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="field">
-                        <label for="pdf">PDF</label>
-                        <input id="pdf" type="file" name="pdf" accept=".pdf">
-                        @error('pdf')
-                            <div class="error">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="actions">
-                        <button class="button" type="submit">Simpan Materi</button>
-                        <a class="button secondary" href="{{ route('speaking.materials.index') }}">Batal</a>
-                    </div>
-                </form>
-
-                <aside class="side-panel">
-                    <div class="side-head">
-                        <h2>Upload</h2>
-                    </div>
-                    <div class="side-body">
-                        <div class="summary-row">
-                            <span>Video</span>
-                            <span>MP4, MOV, AVI</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>PDF</span>
-                            <span>Opsional</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Status</span>
-                            <span>Draft baru</span>
-                        </div>
-                    </div>
-                </aside>
-            </div>
-        </main>
-    </div>
-</body>
-</html>
+        {{-- Form Actions --}}
+        <div class="flex items-center gap-3 pt-2">
+            <button type="submit"
+                    class="inline-flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-yellow-950 text-sm font-extrabold px-6 py-3.5 rounded-xl shadow-sm transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Simpan Materi
+            </button>
+            <a href="{{ route('learning.materials.index') }}"
+               class="inline-flex items-center text-sm font-bold text-gray-600 bg-gray-150 hover:bg-gray-200 px-6 py-3.5 rounded-xl transition-colors">
+                Batal
+            </a>
+        </div>
+    </form>
+</div>
+@endsection
