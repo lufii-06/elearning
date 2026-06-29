@@ -29,6 +29,7 @@
             @csrf
             @method('PUT')
 
+            {{-- Judul --}}
             <div>
                 <label for="title" class="block text-sm font-semibold text-gray-700 mb-1.5">Judul <span class="text-red-500">*</span></label>
                 <input type="text" id="title" name="title" value="{{ old('title', $material->title) }}" required
@@ -38,6 +39,24 @@
                 @enderror
             </div>
 
+            {{-- Hubungkan Ke Paket Kursus --}}
+            <div>
+                <label for="package_id" class="block text-sm font-semibold text-gray-700 mb-1.5">Hubungkan ke Paket Kursus</label>
+                <select id="package_id" name="package_id"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors">
+                    <option value="">Pilih Paket Kursus (Opsional)</option>
+                    @foreach($packages as $package)
+                        <option value="{{ $package->id }}" @selected(old('package_id', $material->package_id) == $package->id)>
+                            {{ $package->display_name }} ({{ $package->formatted_price }})
+                        </option>
+                    @endforeach
+                </select>
+                @error('package_id')
+                    <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            {{-- Deskripsi --}}
             <div>
                 <label for="description" class="block text-sm font-semibold text-gray-700 mb-1.5">Deskripsi</label>
                 <textarea id="description" name="description" rows="4"
@@ -47,6 +66,7 @@
                 @enderror
             </div>
 
+            {{-- Kategori --}}
             <div>
                 <label for="kategori" class="block text-sm font-semibold text-gray-700 mb-1.5">Kategori <span class="text-red-500">*</span></label>
                 <select id="kategori" name="kategori" required
@@ -62,6 +82,7 @@
                 @enderror
             </div>
 
+            {{-- Video Baru --}}
             <div>
                 <label for="video" class="block text-sm font-semibold text-gray-700 mb-1.5">
                     Video Baru
@@ -74,6 +95,20 @@
                 @enderror
             </div>
 
+            {{-- Audio Baru --}}
+            <div>
+                <label for="audio" class="block text-sm font-semibold text-gray-700 mb-1.5">
+                    Audio Baru
+                    <span class="font-normal text-gray-400 text-xs ml-1">MP3, WAV, M4A — kosongkan jika tidak diubah</span>
+                </label>
+                <input type="file" id="audio" name="audio" accept=".mp3,.wav,.m4a,.aac"
+                       class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 border border-gray-200 rounded-xl px-2 py-1.5">
+                @error('audio')
+                    <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            {{-- PDF Baru --}}
             <div>
                 <label for="pdf" class="block text-sm font-semibold text-gray-700 mb-1.5">
                     PDF Baru
@@ -82,6 +117,19 @@
                 <input type="file" id="pdf" name="pdf" accept=".pdf"
                        class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 border border-gray-200 rounded-xl px-2 py-1.5">
                 @error('pdf')
+                    <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            {{-- Learning Guide Baru --}}
+            <div>
+                <label for="learning_guide" class="block text-sm font-semibold text-gray-700 mb-1.5">
+                    Learning Guide Baru (PDF)
+                    <span class="font-normal text-gray-400 text-xs ml-1">Opsional — kosongkan jika tidak diubah</span>
+                </label>
+                <input type="file" id="learning_guide" name="learning_guide" accept=".pdf"
+                       class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-rose-50 file:text-rose-700 hover:file:bg-rose-100 border border-gray-200 rounded-xl px-2 py-1.5">
+                @error('learning_guide')
                     <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
                 @enderror
             </div>
@@ -115,6 +163,12 @@
                 </span>
             </div>
             <div>
+                <p class="text-[10px] font-black uppercase tracking-widest text-green-400/70 mb-1.5">Paket Kursus</p>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-white/10 text-sm font-semibold">
+                    {{ $material->package ? $material->package->display_name : 'Tidak Terhubung ke Paket' }}
+                </span>
+            </div>
+            <div>
                 <p class="text-[10px] font-black uppercase tracking-widest text-green-400/70 mb-1.5">Video</p>
                 @if($material->video)
                     <a href="{{ asset('storage/' . $material->video) }}" target="_blank"
@@ -129,6 +183,20 @@
                 @endif
             </div>
             <div>
+                <p class="text-[10px] font-black uppercase tracking-widest text-green-400/70 mb-1.5">Audio</p>
+                @if($material->audio)
+                    <a href="{{ asset('storage/' . $material->audio) }}" target="_blank"
+                       class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-300 hover:text-emerald-200 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"/>
+                        </svg>
+                        Buka Audio
+                    </a>
+                @else
+                    <span class="text-xs text-white/40">Belum ada audio</span>
+                @endif
+            </div>
+            <div>
                 <p class="text-[10px] font-black uppercase tracking-widest text-green-400/70 mb-1.5">PDF</p>
                 @if($material->pdf)
                     <a href="{{ asset('storage/' . $material->pdf) }}" target="_blank"
@@ -140,6 +208,20 @@
                     </a>
                 @else
                     <span class="text-xs text-white/40">Belum ada PDF</span>
+                @endif
+            </div>
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-widest text-green-400/70 mb-1.5">Learning Guide</p>
+                @if($material->learning_guide)
+                    <a href="{{ asset('storage/' . $material->learning_guide) }}" target="_blank"
+                       class="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-300 hover:text-rose-200 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                        </svg>
+                        Buka Guide
+                    </a>
+                @else
+                    <span class="text-xs text-white/40">Belum ada Learning Guide</span>
                 @endif
             </div>
         </div>

@@ -2,7 +2,7 @@
 
 @section('title', 'Learning Materials')
 @section('page_title', 'Learning Materials')
-@section('page_subtitle', 'Kelola video pembelajaran, dokumen PDF, dan materi learning.')
+@section('page_subtitle', 'Kelola video pembelajaran, audio, dokumen PDF, dan materi learning.')
 
 @section('header_actions')
     <a href="{{ route('learning.materials.create') }}"
@@ -40,10 +40,22 @@
         {{ $materials->whereNotNull('video')->count() }} video
     </div>
     <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm">
+        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"/>
+        </svg>
+        {{ $materials->whereNotNull('audio')->count() }} audio
+    </div>
+    <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm">
         <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
         </svg>
         {{ $materials->whereNotNull('pdf')->count() }} PDF
+    </div>
+    <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm">
+        <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        {{ $materials->whereNotNull('learning_guide')->count() }} guide
     </div>
 </div>
 
@@ -73,9 +85,9 @@
                     <tr class="border-b border-gray-100 bg-gray-50/60">
                         <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-6 py-3">Materi</th>
                         <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-4 py-3">Kategori</th>
-                        <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-4 py-3">Deskripsi</th>
-                        <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-4 py-3">Video</th>
-                        <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-4 py-3">PDF</th>
+                        <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-4 py-3">Paket Kursus</th>
+                        <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-4 py-3">File Video / Audio</th>
+                        <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-4 py-3">File Dokumen</th>
                         <th class="text-left text-xs font-bold text-gray-500 uppercase tracking-wider px-4 py-3">Dibuat</th>
                         <th class="text-right text-xs font-bold text-gray-500 uppercase tracking-wider px-6 py-3">Aksi</th>
                     </tr>
@@ -88,7 +100,10 @@
                                 <span class="w-8 h-8 rounded-lg bg-green-50 text-green-700 text-xs font-black flex items-center justify-center flex-shrink-0 border border-green-100">
                                     {{ $loop->iteration }}
                                 </span>
-                                <p class="font-semibold text-gray-900">{{ $material->title }}</p>
+                                <div class="min-w-0">
+                                    <p class="font-semibold text-gray-900 truncate">{{ $material->title }}</p>
+                                    <p class="text-xs text-gray-400 truncate max-w-xs">{{ $material->description ?: '—' }}</p>
+                                </div>
                             </div>
                         </td>
                         <td class="px-4 py-4">
@@ -96,33 +111,67 @@
                                 {{ $material->kategori }}
                             </span>
                         </td>
-                        <td class="px-4 py-4 text-gray-500 max-w-xs truncate">
-                            {{ $material->description ?: '—' }}
-                        </td>
                         <td class="px-4 py-4">
-                            @if($material->video)
-                                <a href="{{ asset('storage/' . $material->video) }}" target="_blank"
-                                   class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 rounded-lg transition-colors">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/>
-                                    </svg>
-                                    Video
-                                </a>
+                            @if($material->package)
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold">
+                                    {{ $material->package->display_name }}
+                                </span>
                             @else
-                                <span class="text-gray-300 text-xs font-semibold">Kosong</span>
+                                <span class="text-gray-400 text-xs">—</span>
                             @endif
                         </td>
-                        <td class="px-4 py-4">
+                        <td class="px-4 py-4 space-y-1">
+                            @if($material->video)
+                                <div>
+                                    <a href="{{ asset('storage/' . $material->video) }}" target="_blank"
+                                       class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 rounded-lg transition-colors">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/>
+                                        </svg>
+                                        Video
+                                    </a>
+                                </div>
+                            @endif
+                            @if($material->audio)
+                                <div>
+                                    <a href="{{ asset('storage/' . $material->audio) }}" target="_blank"
+                                       class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1.5 rounded-lg transition-colors">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"/>
+                                        </svg>
+                                        Audio
+                                    </a>
+                                </div>
+                            @endif
+                            @if(!$material->video && !$material->audio)
+                                <span class="text-gray-300 text-xs font-semibold">Tidak ada</span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-4 space-y-1">
                             @if($material->pdf)
-                                <a href="{{ asset('storage/' . $material->pdf) }}" target="_blank"
-                                   class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-600 bg-amber-50 hover:bg-amber-100 px-2.5 py-1.5 rounded-lg transition-colors">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
-                                    </svg>
-                                    PDF
-                                </a>
-                            @else
-                                <span class="text-gray-300 text-xs font-semibold">Kosong</span>
+                                <div>
+                                    <a href="{{ asset('storage/' . $material->pdf) }}" target="_blank"
+                                       class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-600 bg-amber-50 hover:bg-amber-100 px-2.5 py-1.5 rounded-lg transition-colors">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                                        </svg>
+                                        PDF
+                                    </a>
+                                </div>
+                            @endif
+                            @if($material->learning_guide)
+                                <div>
+                                    <a href="{{ asset('storage/' . $material->learning_guide) }}" target="_blank"
+                                       class="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 px-2.5 py-1.5 rounded-lg transition-colors">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        Guide (PDF)
+                                    </a>
+                                </div>
+                            @endif
+                            @if(!$material->pdf && !$material->learning_guide)
+                                <span class="text-gray-300 text-xs font-semibold">Tidak ada</span>
                             @endif
                         </td>
                         <td class="px-4 py-4 text-gray-400 text-xs">

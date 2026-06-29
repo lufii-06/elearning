@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LearningMaterial;
+use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,7 +12,9 @@ class LearningMaterialController extends Controller
     private function addFileUrls(LearningMaterial $material): LearningMaterial
     {
         $material->video_url = $material->video ? asset('storage/' . $material->video) : null;
+        $material->audio_url = $material->audio ? asset('storage/' . $material->audio) : null;
         $material->pdf_url = $material->pdf ? asset('storage/' . $material->pdf) : null;
+        $material->learning_guide_url = $material->learning_guide ? asset('storage/' . $material->learning_guide) : null;
 
         return $material;
     }
@@ -21,7 +24,7 @@ class LearningMaterialController extends Controller
      */
     public function index()
     {
-        $materials = LearningMaterial::all();
+        $materials = LearningMaterial::with('package')->get();
 
         foreach ($materials as $item) {
             $this->addFileUrls($item);
@@ -35,7 +38,7 @@ class LearningMaterialController extends Controller
     // ======================
     public function byCategory(string $kategori)
     {
-        $materials = LearningMaterial::where('kategori', $kategori)->get();
+        $materials = LearningMaterial::where('kategori', $kategori)->with('package')->get();
 
         foreach ($materials as $item) {
             $this->addFileUrls($item);
@@ -60,25 +63,40 @@ class LearningMaterialController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage (API).
      */
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'kategori' => 'required|string|max:255',
             'video' => 'required|mimes:mp4,mov,avi',
-            'pdf' => 'nullable|mimes:pdf'
+            'audio' => 'nullable|mimes:mp3,wav,ogg,m4a,aac',
+            'pdf' => 'nullable|mimes:pdf',
+            'learning_guide' => 'nullable|mimes:pdf',
+            'package_id' => 'nullable|exists:packages,id',
         ]);
 
         // ========================== VIDEO ==========================
         $video = $request->file('video')->store('videos', 'public');
 
+        // ========================== AUDIO ==========================
+        $audio = null;
+        if ($request->hasFile('audio')) {
+            $audio = $request->file('audio')->store('audios', 'public');
+        }
+
         // ========================== PDF ==========================
         $pdf = null;
-
         if ($request->hasFile('pdf')) {
             $pdf = $request->file('pdf')->store('pdfs', 'public');
+        }
+
+        // ========================== LEARNING GUIDE ==================
+        $learningGuide = null;
+        if ($request->hasFile('learning_guide')) {
+            $learningGuide = $request->file('learning_guide')->store('learning_guides', 'public');
         }
 
         // =================== DATABASE ==================
@@ -87,12 +105,15 @@ class LearningMaterialController extends Controller
             'description' => $request->description,
             'kategori' => $request->kategori,
             'video' => $video,
+            'audio' => $audio,
             'pdf' => $pdf,
+            'learning_guide' => $learningGuide,
+            'package_id' => $request->package_id,
         ]);
 
         return response()->json([
             'message' => 'Materi berhasil upload',
-            'data' => $material
+            'data' => $this->addFileUrls($material)
         ]);
     }
 
@@ -111,7 +132,8 @@ class LearningMaterialController extends Controller
     // ======================
     public function create()
     {
-        return view('learning.create');
+        $packages = Package::orderBy('sort_order')->get();
+        return view('learning.create', compact('packages'));
     }
 
     // ======================
@@ -124,17 +146,31 @@ class LearningMaterialController extends Controller
             'description' => 'nullable|string',
             'kategori' => 'required|string|max:255',
             'video' => 'required|mimes:mp4,mov,avi',
-            'pdf' => 'nullable|mimes:pdf'
+            'audio' => 'nullable|mimes:mp3,wav,ogg,m4a,aac',
+            'pdf' => 'nullable|mimes:pdf',
+            'learning_guide' => 'nullable|mimes:pdf',
+            'package_id' => 'nullable|exists:packages,id',
         ]);
 
         // ========================== VIDEO ================
         $video = $request->file('video')->store('videos', 'public');
 
+        // ========================== AUDIO ================
+        $audio = null;
+        if ($request->hasFile('audio')) {
+            $audio = $request->file('audio')->store('audios', 'public');
+        }
+
         // ========================== PDF ====================
         $pdf = null;
-
         if ($request->hasFile('pdf')) {
             $pdf = $request->file('pdf')->store('pdfs', 'public');
+        }
+
+        // ========================== LEARNING GUIDE ====================
+        $learningGuide = null;
+        if ($request->hasFile('learning_guide')) {
+            $learningGuide = $request->file('learning_guide')->store('learning_guides', 'public');
         }
 
         // =================== DATABASE ==================
@@ -143,7 +179,10 @@ class LearningMaterialController extends Controller
             'description' => $request->description,
             'kategori' => $request->kategori,
             'video' => $video,
+            'audio' => $audio,
             'pdf' => $pdf,
+            'learning_guide' => $learningGuide,
+            'package_id' => $request->package_id,
         ]);
 
         return redirect()
@@ -156,7 +195,7 @@ class LearningMaterialController extends Controller
     // ======================
     public function materials()
     {
-        $materials = LearningMaterial::latest()->get();
+        $materials = LearningMaterial::with('package')->latest()->get();
 
         return view('learning.index', compact('materials'));
     }
@@ -167,8 +206,9 @@ class LearningMaterialController extends Controller
     public function editWeb(string $id)
     {
         $material = LearningMaterial::findOrFail($id);
+        $packages = Package::orderBy('sort_order')->get();
 
-        return view('learning.edit', compact('material'));
+        return view('learning.edit', compact('material', 'packages'));
     }
 
     // ======================
@@ -183,23 +223,38 @@ class LearningMaterialController extends Controller
             'description' => 'nullable|string',
             'kategori' => 'required|string|max:255',
             'video' => 'nullable|mimes:mp4,mov,avi',
+            'audio' => 'nullable|mimes:mp3,wav,ogg,m4a,aac',
             'pdf' => 'nullable|mimes:pdf',
+            'learning_guide' => 'nullable|mimes:pdf',
+            'package_id' => 'nullable|exists:packages,id',
         ]);
 
         if ($request->hasFile('video')) {
             if ($material->video) {
                 Storage::disk('public')->delete($material->video);
             }
-
             $data['video'] = $request->file('video')->store('videos', 'public');
+        }
+
+        if ($request->hasFile('audio')) {
+            if ($material->audio) {
+                Storage::disk('public')->delete($material->audio);
+            }
+            $data['audio'] = $request->file('audio')->store('audios', 'public');
         }
 
         if ($request->hasFile('pdf')) {
             if ($material->pdf) {
                 Storage::disk('public')->delete($material->pdf);
             }
-
             $data['pdf'] = $request->file('pdf')->store('pdfs', 'public');
+        }
+
+        if ($request->hasFile('learning_guide')) {
+            if ($material->learning_guide) {
+                Storage::disk('public')->delete($material->learning_guide);
+            }
+            $data['learning_guide'] = $request->file('learning_guide')->store('learning_guides', 'public');
         }
 
         $material->update($data);
@@ -220,8 +275,16 @@ class LearningMaterialController extends Controller
             Storage::disk('public')->delete($material->video);
         }
 
+        if ($material->audio) {
+            Storage::disk('public')->delete($material->audio);
+        }
+
         if ($material->pdf) {
             Storage::disk('public')->delete($material->pdf);
+        }
+
+        if ($material->learning_guide) {
+            Storage::disk('public')->delete($material->learning_guide);
         }
 
         $material->delete();
@@ -232,11 +295,11 @@ class LearningMaterialController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource (API).
      */
     public function show(string $id)
     {
-        $material = LearningMaterial::find($id);
+        $material = LearningMaterial::with('package')->find($id);
 
         if (!$material) {
             return response()->json(['message' => 'Materi learning tidak ketemu'], 404);
@@ -246,7 +309,7 @@ class LearningMaterialController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource in storage (API).
      */
     public function update(Request $request, string $id)
     {
@@ -261,23 +324,38 @@ class LearningMaterialController extends Controller
             'description' => ['nullable', 'string'],
             'kategori' => ['sometimes', 'required', 'string', 'max:255'],
             'video' => ['nullable', 'mimes:mp4,mov,avi'],
+            'audio' => ['nullable', 'mimes:mp3,wav,ogg,m4a,aac'],
             'pdf' => ['nullable', 'mimes:pdf'],
+            'learning_guide' => ['nullable', 'mimes:pdf'],
+            'package_id' => ['nullable', 'exists:packages,id'],
         ]);
 
         if ($request->hasFile('video')) {
             if ($material->video) {
                 Storage::disk('public')->delete($material->video);
             }
-
             $data['video'] = $request->file('video')->store('videos', 'public');
+        }
+
+        if ($request->hasFile('audio')) {
+            if ($material->audio) {
+                Storage::disk('public')->delete($material->audio);
+            }
+            $data['audio'] = $request->file('audio')->store('audios', 'public');
         }
 
         if ($request->hasFile('pdf')) {
             if ($material->pdf) {
                 Storage::disk('public')->delete($material->pdf);
             }
-
             $data['pdf'] = $request->file('pdf')->store('pdfs', 'public');
+        }
+
+        if ($request->hasFile('learning_guide')) {
+            if ($material->learning_guide) {
+                Storage::disk('public')->delete($material->learning_guide);
+            }
+            $data['learning_guide'] = $request->file('learning_guide')->store('learning_guides', 'public');
         }
 
         $material->update($data);
@@ -289,7 +367,7 @@ class LearningMaterialController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage (API).
      */
     public function destroy(string $id)
     {
@@ -303,8 +381,16 @@ class LearningMaterialController extends Controller
             Storage::disk('public')->delete($material->video);
         }
 
+        if ($material->audio) {
+            Storage::disk('public')->delete($material->audio);
+        }
+
         if ($material->pdf) {
             Storage::disk('public')->delete($material->pdf);
+        }
+
+        if ($material->learning_guide) {
+            Storage::disk('public')->delete($material->learning_guide);
         }
 
         $material->delete();
@@ -312,3 +398,4 @@ class LearningMaterialController extends Controller
         return response()->json(['message' => 'Materi learning berhasil dihapus']);
     }
 }
+
